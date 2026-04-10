@@ -23,6 +23,19 @@ const findUserByName = (name: string) => {
   );
 };
 
+const findUserById = (id: string) =>
+  users["users_list"].find((user) => user["id"] === id);
+
+app.get("/users/:id", (req: Request, res: Response) => {
+  const id = req.params.id as string
+  let result = findUserById(id);
+  if (result === undefined) {
+    res.status(404).send("Resource not found.");
+  } else {
+    res.send(result);
+  }
+});
+
 app.get("/users", (req: Request, res: Response) => {
   const name = req.query.name as string
   if (name != undefined) {
