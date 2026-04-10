@@ -17,8 +17,20 @@ app.listen(port, () => {
   );
 });
 
+const findUserByName = (name: string) => {
+  return users["users_list"].filter(
+    (user) => user["name"] === name
+  );
+};
+
 app.get("/users", (req: Request, res: Response) => {
-  res.send(users);
+  const name = req.query.name as string
+  if (name != undefined) {
+    let result = findUserByName(name);
+    res.send( { users_list: result } );
+  } else {
+    res.send(users);
+  }
 });
 
 const users = {
