@@ -1,22 +1,73 @@
 // src/MyApp.tsx
-import React from "react";
 import Table from "./Table";
-import { useState } from "react";
+import React, {useState, useEffect} from "react";
 import Form from "./form";
 
 function MyApp() {
   const [characters, setCharacters] = useState([]);
 
   function removeOneCharacter(index:any) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
-    });
-    setCharacters(updated);
+
+    const promise = fetch("http://localhost:8000/users", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(characters[index]),
+    })
+    
+    promise.then((res) => {
+      if (res.status == 204) {
+        const updated = characters.filter((character, i) => {
+          return i !== index;
+        });
+        setCharacters(updated);
+      }
+    })
+
+  
+    return promise;
   }
 
-  function updateList(person) {
-    setCharacters([...characters, person]);
+  function updateList(person) { 
+    postUser(person)
+      .then((res) => {
+        if (res.status === 201) {
+          return res.json();
+        }
+      })
+      .then((newUser) => {
+        setCharacters([...characters, newUser]);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
   }
+
+  function postUser(person) {
+    const promise = fetch("http://localhost:8000/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(person),
+    });
+
+    return promise;
+  }
+
+
+  function fetchUsers() {
+    const promise = fetch("http://localhost:8000/users");
+    return promise;
+  }
+
+  useEffect(() => {
+    fetchUsers()
+	    .then((res) => res.json())
+	    .then((json) => setCharacters(json["users_list"]))
+	    .catch((error) => { console.log(error); });
+  }, [] );
 
   return (
     <div className="container">

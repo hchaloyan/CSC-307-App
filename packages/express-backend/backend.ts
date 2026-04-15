@@ -1,15 +1,17 @@
 // backend.ts
 import express from "express";
 import type {Request, Response} from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
 
+app.use(cors());
 app.use(express.json());
 
 
 interface User {
-    id: string;
+    id: number;
     name: string;
     job: string;
 }
@@ -26,6 +28,7 @@ app.listen(port, () => {
 });
 
 const addUser = (user: User) => {
+  user.id = generateId();
   users["users_list"].push(user);
   return user;
 };
@@ -35,16 +38,29 @@ const deleteUser = (user: User) => {
   return users["users_list"];
 };
 
+const generateId = () => {
+  return Math.floor(Math.random() * 100000) 
+}
+
 app.post("/users", (req: Request, res: Response) => {
   const userToAdd = req.body;
   addUser(userToAdd);
-  res.send();
+  res.status(201).send(userToAdd);
 });
 
 app.delete("/users", (req: Request, res: Response) => {
     const userToDelete = req.body;
+    
+    const oldList = users["users_list"];
+    
     deleteUser(userToDelete);
-    res.send();
+
+    if( users["users_list"] === oldList) {
+      res.status(404).send("Resource not found.")
+    }
+    else{
+      res.status(204).send();
+    } 
 });
 
 const findUserByName = (name: string) => {

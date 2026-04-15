@@ -4,7 +4,6 @@
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "commonjs",
   "type": "module",
   "main": "backend.ts",
   "scripts": {
@@ -14,6 +13,7 @@
   },
   "dependencies": {
     "@types/express": "^5.0.6",
+    "cors": "^2.8.6",
     "express": "^5.2.1"
   }
 }
